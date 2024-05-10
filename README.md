@@ -1,5 +1,5 @@
 # firestarter
-A POC for exploring doing blackbox synthetics with Target observability stack [Prometheus + Grafana]
+A POC environment for exploring/testing creating Telemessage observability assets on 1SP Target observability stack [Prometheus + Grafana]
 
 ## Getting started
 ```bash
@@ -9,12 +9,60 @@ minikube delete
 # start a new minikube cluster
 minikube start 
 
+
+# install and configure prometheus-operator
+kubectl apply -f prometheus-operator/namespace.yaml 
+kubectl apply --server-side -f prometheus-operator/crd/
+kubectl apply -f prometheus-operator/rbac/
+kubectl apply -f prometheus-operator/deployment/
+
+# install and configure prometheus
+kubectl apply -f prometheus/
+
+# ensure pods & services are running
+kubectl get pods -n monitoring
+NAME                                   READY   STATUS    RESTARTS   AGE
+prometheus-main-0                      2/2     Running   0          3m55s
+prometheus-operator-5895f6fbd8-2zqkw   1/1     Running   0          9m25s
+
+kubectl get services -n monitoring
+NAME                  TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+prometheus-operated   ClusterIP   None         <none>        9090/TCP   3m28s
+
+# expose prometheus UI at http://localhost:9090
+kubectl port-forward svc/prometheus-operated 9090 -n monitoring
+
+# install grafana via helm
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+helm install grafana grafana/grafana
+
+
 # install prometheus + grafana using helm (kube-prometheus-stack)
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 helm install prometheus prometheus-community/kube-prometheus-stack
 
+# get your grafana 'admin' password
+kubectl get secret --namespace default grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 
+# expose Grafana UI
+export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace default port-forward $POD_NAME 3000
+```
+
+
+
+
+
+
+
+
+
+
+
+# Additional
+```bash
 # installl prometheus blackbox exporter
 helm install prometheus-blackbox-exporter prometheus-community/prometheus-blackbox-exporter
 
