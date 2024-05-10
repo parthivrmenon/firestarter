@@ -1,5 +1,18 @@
 # firestarter
-A POC environment for exploring/testing creating Telemessage observability assets on 1SP Target observability stack [Prometheus + Grafana]
+This project contains all the scripts and test environments to migrate TM observability assets onto 1SP.
+
+
+## Audit
+```bash
+
+export GRAFANA_URL="https://grafana.example.com"
+export GRAFANA_USER="changeme"
+export GRAFANA_PASS="changeme"
+
+source venv/bin/activate
+python audit/main.py
+
+```
 
 ## Getting started
 ```bash
