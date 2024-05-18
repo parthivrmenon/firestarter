@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: magic-8-ball-deployment
+spec:
+  selector:
+    matchLabels:
+      app: magic-8-ball
+  template:
+    metadata:
+      labels:
+        app: magic-8-ball
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-credentials
+      containers:
+      - name: magic-8-ball-container
+        image: pluto92/magic-8-ball:latest 
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080  # Adjust the port as needed
+        # env:
+        # - name: RABBITMQ_HOST
+        #   value: "rabbitmq"
+        # - name: RABBITMQ_PORT
+        #   value: "5672"
+        # - name: RABBITMQ_USERNAME
+        #   value: "rabbitmq"
+        # - name: RABBITMQ_PASSWORD
+        #   value: "rabbitmq"
+
+      
